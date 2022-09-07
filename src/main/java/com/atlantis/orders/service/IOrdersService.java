@@ -7,4 +7,5 @@ import org.springframework.stereotype.Component;
 public interface IOrdersService {
 
     Orders getOrderById(Integer id);
+    void addOrder (Orders order);
 }

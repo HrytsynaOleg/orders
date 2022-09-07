@@ -13,6 +13,11 @@ public class OrdersServiceImpl implements IOrdersService{
 
     @Override
     public Orders getOrderById(Integer id) {
-        return ordersRepository.getOrder(id);
+        return ordersRepository.getOrderById(id);
+    }
+
+    @Override
+    public void addOrder(Orders order) {
+        ordersRepository.putOrder(order);
     }
 }

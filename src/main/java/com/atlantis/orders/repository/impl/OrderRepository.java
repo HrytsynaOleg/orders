@@ -11,27 +11,27 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 @Repository
 public class OrderRepository implements IOrdersRepository {
-    @Autowired
-    private DynamoDbEnhancedClient dynamoDbenhancedClient;
 
-    public OrderRepository() {
-        super();
+
+    private final DynamoDbTable<Orders> ordersDynamoDbTable;
+
+    @Autowired
+    public OrderRepository(DynamoDbEnhancedClient dynamoDbenhancedClient) {
+        this.ordersDynamoDbTable = dynamoDbenhancedClient.table("SupplierOrders", TableSchema.fromBean(Orders.class));
     }
 
     @Override
-    public Orders getOrder(final Integer orderID) {
-
-        DynamoDbTable<Orders> orderTable = getTable();
+    public Orders getOrderById(final Integer orderID) {
 
         Key key = Key.builder().partitionValue(orderID)
 //                .sortValue(orderID)
                 .build();
-
-        return orderTable.getItem(key);
+        return ordersDynamoDbTable.getItem(key);
     }
 
-
-    private DynamoDbTable<Orders> getTable() {
-        return dynamoDbenhancedClient.table("SupplierOrders", TableSchema.fromBean(Orders.class));
+    @Override
+    public void putOrder(Orders order) {
+        ordersDynamoDbTable.putItem(order);
     }
+
 }
