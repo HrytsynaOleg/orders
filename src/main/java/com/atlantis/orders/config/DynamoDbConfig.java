@@ -13,62 +13,70 @@ import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 
 @Configuration
-@EnableDynamoDBRepositories
-        (basePackages = "com.example.demo.repository")
+//@EnableDynamoDBRepositories
+//        (basePackages = "com.example.demo.repository")
 public class DynamoDbConfig {
-    @Value("${amazon.dynamodb.endpoint}")
-    private String amazonDynamoDBEndpoint;
+//    @Value("${amazon.dynamodb.endpoint}")
+//    private String amazonDynamoDBEndpoint;
+//
+//    @Value("${amazon.aws.accesskey}")
+//    private String amazonAWSAccessKey;
+//
+//    @Value("${amazon.aws.secretkey}")
+//    private String amazonAWSSecretKey;
+//
+//    @Bean
+//    public AmazonDynamoDB amazonDynamoDB() {
+//        AmazonDynamoDB amazonDynamoDB
+//                = new AmazonDynamoDBClient(amazonBasicAWSCredentials());
+//
+//        if (!amazonDynamoDBEndpoint.isEmpty()) {
+//            amazonDynamoDB.setEndpoint(amazonDynamoDBEndpoint);
+//        }
+//
+//        return amazonDynamoDB;
+//    }
+//
+//    @Bean
+//    public AWSCredentials amazonBasicAWSCredentials() {
+//        return new BasicAWSCredentials(
+//                amazonAWSAccessKey, amazonAWSSecretKey);
+//    }
 
-    @Value("${amazon.aws.accesskey}")
-    private String amazonAWSAccessKey;
-
-    @Value("${amazon.aws.secretkey}")
-    private String amazonAWSSecretKey;
-
-    @Bean
-    public AmazonDynamoDB amazonDynamoDB() {
-        AmazonDynamoDB amazonDynamoDB
-                = new AmazonDynamoDBClient(amazonBasicAWSCredentials());
-
-        if (!amazonDynamoDBEndpoint.isEmpty()) {
-            amazonDynamoDB.setEndpoint(amazonDynamoDBEndpoint);
-        }
-
-        return amazonDynamoDB;
-    }
-
-    @Bean
-    public AWSCredentials amazonBasicAWSCredentials() {
-        return new BasicAWSCredentials(
-                amazonAWSAccessKey, amazonAWSSecretKey);
-    }
-
-    @Bean
-    public AwsCredentials amazonAwsCredentials() {
-        return new AwsCredentials() {
-
-            @Override
-            public String accessKeyId() {
-                return amazonAWSAccessKey;
-            }
-
-            @Override
-            public String secretAccessKey() {
-                return amazonAWSSecretKey;
-            }
-        };
-    }
+//    @Bean
+//    public AwsCredentials amazonAwsCredentials() {
+//        return new AwsCredentials() {
+//
+//            @Override
+//            public String accessKeyId() {
+//                return amazonAWSAccessKey;
+//            }
+//
+//            @Override
+//            public String secretAccessKey() {
+//                return amazonAWSSecretKey;
+//            }
+//        };
+//    }
 
     @Bean
     public DynamoDbClient getDynamoDbClient() {
-        AwsCredentialsProvider credentialsProvider =
-                StaticCredentialsProvider.create(amazonAwsCredentials());
+//        AwsCredentialsProvider credentialsProvider =
+//                StaticCredentialsProvider.create(amazonAwsCredentials());
+
+//        return DynamoDbClient.builder()
+//                .region(Region.EU_CENTRAL_1)
+//                .credentialsProvider(credentialsProvider).build();
+
+//        AwsCredentialsProvider credentialsProvider =
+//                new EnvironmentVariableCredentialsProvider();
 
         return DynamoDbClient.builder()
                 .region(Region.EU_CENTRAL_1)
-                .credentialsProvider(credentialsProvider).build();
+                .build();
     }
 
     @Bean

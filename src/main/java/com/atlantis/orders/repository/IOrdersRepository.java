@@ -9,5 +9,5 @@ import org.springframework.stereotype.Component;
 public interface IOrdersRepository {
 
     Orders getOrderById(final Integer orderID);
-    void putOrder (Orders order);
+    void putNewOrder(Orders order);
 }

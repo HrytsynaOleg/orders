@@ -18,6 +18,6 @@ public class OrdersServiceImpl implements IOrdersService{
 
     @Override
     public void addOrder(Orders order) {
-        ordersRepository.putOrder(order);
+        ordersRepository.putNewOrder(order);
     }
 }

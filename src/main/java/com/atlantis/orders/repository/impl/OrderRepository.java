@@ -4,14 +4,12 @@ import com.atlantis.orders.dbtables.Orders;
 import com.atlantis.orders.repository.IOrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
 @Repository
 public class OrderRepository implements IOrdersRepository {
-
 
     private final DynamoDbTable<Orders> ordersDynamoDbTable;
 
@@ -30,8 +28,16 @@ public class OrderRepository implements IOrdersRepository {
     }
 
     @Override
-    public void putOrder(Orders order) {
-        ordersDynamoDbTable.putItem(order);
+    public void putNewOrder(Orders order) {
+        PutItemEnhancedRequest<Orders> request = PutItemEnhancedRequest.builder(Orders.class)
+                .item(order)
+                .conditionExpression(Expression.builder().expression("attribute_not_exists(OrderId)").build())
+                .build();
+        try {
+            ordersDynamoDbTable.putItem(request);
+        } catch (ConditionalCheckFailedException ex) {
+            System.err.println("Item already exist");
+        }
     }
 
 }
