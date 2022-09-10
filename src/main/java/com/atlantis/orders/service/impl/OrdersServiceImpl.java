@@ -1,13 +1,14 @@
-package com.atlantis.orders.service;
+package com.atlantis.orders.service.impl;
 
 
 import com.atlantis.orders.dbtables.Orders;
 import com.atlantis.orders.repository.IOrdersRepository;
+import com.atlantis.orders.service.IOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrdersServiceImpl implements IOrdersService{
+public class OrdersServiceImpl implements IOrdersService {
     @Autowired
     private IOrdersRepository ordersRepository;
 

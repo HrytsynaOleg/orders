@@ -12,15 +12,9 @@ import java.util.List;
 public class Orders {
 
     private Integer orderId;
-
     private String customerOrderId;
-
     private List<Product> products;
-
-    //    @DynamoDBAttribute(attributeName = "Status")
     private String status;
-
-    //    @DynamoDBAttribute(attributeName = "SupplierId")
     private String supplierId;
 
     public Orders() {
