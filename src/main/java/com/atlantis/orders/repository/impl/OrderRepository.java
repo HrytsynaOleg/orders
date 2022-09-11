@@ -1,6 +1,6 @@
 package com.atlantis.orders.repository.impl;
 
-import com.atlantis.orders.dbtables.Orders;
+import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.repository.IOrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -11,15 +11,15 @@ import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedExce
 @Repository
 public class OrderRepository implements IOrdersRepository {
 
-    private final DynamoDbTable<Orders> ordersDynamoDbTable;
+    private final DynamoDbTable<Order> ordersDynamoDbTable;
 
     @Autowired
     public OrderRepository(DynamoDbEnhancedClient dynamoDbenhancedClient) {
-        this.ordersDynamoDbTable = dynamoDbenhancedClient.table("SupplierOrders", TableSchema.fromBean(Orders.class));
+        this.ordersDynamoDbTable = dynamoDbenhancedClient.table("SupplierOrders", TableSchema.fromBean(Order.class));
     }
 
     @Override
-    public Orders getOrderById(final Integer orderID) {
+    public Order getOrderById(final Integer orderID) {
 
         Key key = Key.builder().partitionValue(orderID)
 //                .sortValue(orderID)
@@ -28,8 +28,8 @@ public class OrderRepository implements IOrdersRepository {
     }
 
     @Override
-    public void putNewOrder(Orders order) {
-        PutItemEnhancedRequest<Orders> request = PutItemEnhancedRequest.builder(Orders.class)
+    public void putNewOrder(Order order) {
+        PutItemEnhancedRequest<Order> request = PutItemEnhancedRequest.builder(Order.class)
                 .item(order)
                 .conditionExpression(Expression.builder().expression("attribute_not_exists(OrderId)").build())
                 .build();

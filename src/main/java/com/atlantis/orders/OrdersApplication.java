@@ -1,7 +1,9 @@
 package com.atlantis.orders;
 
-import com.atlantis.orders.dbtables.Orders;
+import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.models.Product;
+import com.atlantis.orders.onebox.OneboxApiOrdersService;
+import com.atlantis.orders.onebox.OneboxApiSecurityService;
 import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.service.IOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,9 @@ public class OrdersApplication implements CommandLineRunner {
     @Autowired
     IOrdersService ordersService;
     @Autowired
-    IAwsSecretService secretService;
+    OneboxApiOrdersService oneboxApiOrdersService;
+    @Autowired
+    OneboxApiSecurityService oneboxApiSecurityService;
 
     public static void main(String[] args) {
         SpringApplication.run(OrdersApplication.class, args);
@@ -28,13 +32,15 @@ public class OrdersApplication implements CommandLineRunner {
     @Override
     public void run(String... args)  {
 
-        String test = secretService.getSecretByKey("test");
-        System.out.println(test);
+        String token = oneboxApiSecurityService.getToken();
+        System.out.println(token);
 
-        Orders order = ordersService.getOrderById(3455);
+        oneboxApiOrdersService.getSupplierOrderListByStatus(117);
+
+        Order order = ordersService.getOrderById(3455);
         System.out.println(order);
 
-        Orders newOrder = new Orders();
+        Order newOrder = new Order();
         newOrder.setOrderId(5678);
         newOrder.setCustomerOrderId("56474");
         newOrder.setStatus("NEW");

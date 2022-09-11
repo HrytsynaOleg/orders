@@ -1,7 +1,7 @@
 package com.atlantis.orders.service.impl;
 
 
-import com.atlantis.orders.dbtables.Orders;
+import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.repository.IOrdersRepository;
 import com.atlantis.orders.service.IOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +13,12 @@ public class OrdersServiceImpl implements IOrdersService {
     private IOrdersRepository ordersRepository;
 
     @Override
-    public Orders getOrderById(Integer id) {
+    public Order getOrderById(Integer id) {
         return ordersRepository.getOrderById(id);
     }
 
     @Override
-    public void addOrder(Orders order) {
+    public void addOrder(Order order) {
         ordersRepository.putNewOrder(order);
     }
 }

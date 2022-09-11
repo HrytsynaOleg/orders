@@ -11,13 +11,6 @@ public class Product {
     private String productPrice;
     private String productQty;
 
-    //    public Product(String productCode, String productBrand, String productName, String productPrice, String productQty) {
-//        this.productCode = productCode;
-//        this.productBrand = productBrand;
-//        this.productName = productName;
-//        this.productPrice = productPrice;
-//        this.productQty = productQty;
-//    }
     @DynamoDbAttribute("ProductCode")
     public String getProductCode() {
         return productCode;

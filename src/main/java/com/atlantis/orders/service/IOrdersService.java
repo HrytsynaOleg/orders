@@ -1,11 +1,11 @@
 package com.atlantis.orders.service;
 
-import com.atlantis.orders.dbtables.Orders;
+import com.atlantis.orders.dbtables.Order;
 import org.springframework.stereotype.Component;
 
 @Component
 public interface IOrdersService {
 
-    Orders getOrderById(Integer id);
-    void addOrder (Orders order);
+    Order getOrderById(Integer id);
+    void addOrder (Order order);
 }

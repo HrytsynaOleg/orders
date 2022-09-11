@@ -9,7 +9,7 @@ import java.util.List;
 
 @DynamoDbBean
 
-public class Orders {
+public class Order {
 
     private Integer orderId;
     private String customerOrderId;
@@ -17,7 +17,7 @@ public class Orders {
     private String status;
     private String supplierId;
 
-    public Orders() {
+    public Order() {
     }
 
     @DynamoDbPartitionKey

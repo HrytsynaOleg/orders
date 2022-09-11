@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
+import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 
 @Service
 public class AwsSecretService implements IAwsSecretService {
@@ -16,11 +17,16 @@ public class AwsSecretService implements IAwsSecretService {
 
     @Override
     public String getSecretByKey(String key) {
-        GetParameterResponse parameter = ssmClient.getParameter(GetParameterRequest.builder()
-                .name(key)
-                .withDecryption(true)
-                .build());
-
-        return parameter.parameter().value();
+        try {
+            GetParameterResponse parameter = ssmClient.getParameter(GetParameterRequest.builder()
+                    .name(key)
+                    .withDecryption(true)
+                    .build());
+            return parameter.parameter().value();
+        }
+        catch (ParameterNotFoundException ex) {
+            System.err.println("Key not found");
+            return "";
+        }
     }
 }
