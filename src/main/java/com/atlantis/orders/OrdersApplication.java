@@ -4,8 +4,10 @@ import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.models.Product;
 import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.onebox.OneboxApiSecurityService;
+import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.service.IOrdersService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,12 +32,13 @@ public class OrdersApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args)  {
+    public void run(String... args) {
 
         String token = oneboxApiSecurityService.getToken();
         System.out.println(token);
 
-        oneboxApiOrdersService.getSupplierOrderListByStatus(117);
+        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getSupplierOrderListByStatus(117);
+
 
         Order order = ordersService.getOrderById(3455);
         System.out.println(order);
