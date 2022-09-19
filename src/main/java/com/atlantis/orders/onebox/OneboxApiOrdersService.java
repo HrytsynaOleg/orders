@@ -3,14 +3,10 @@ package com.atlantis.orders.onebox;
 import com.atlantis.orders.constants.OneboxApiEndpoints;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.utils.JsonUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
@@ -36,11 +32,9 @@ public class OneboxApiOrdersService {
         body.put("fields",orderFields);
         body.put("productfields",productFields);
         body.put("filter",filters);
-        String response = OneboxApiRequest.performHttpRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
 
-        List<OneboxOrder> oneboxOrders = JsonUtils.parseJson(response, new TypeReference<>() {});
-
-        return oneboxOrders;
+        return JsonUtils.parseJson(response, new TypeReference<>() {});
 
 
     }

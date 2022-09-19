@@ -25,6 +25,10 @@ public class OneboxApiSecurityService implements IOneboxApiSecurityService{
         if (token == null) requestNewToken();
         return token;
     }
+    public String refreshToken() {
+        requestNewToken();
+        return token;
+    }
 
     private void requestNewToken() {
 
@@ -32,7 +36,7 @@ public class OneboxApiSecurityService implements IOneboxApiSecurityService{
         body.put("restapipassword", secrets.getSecretByKey("restapipassword"));
         body.put("login", secrets.getSecretByKey("login"));
 
-        String resultBody = OneboxApiRequest.performHttpRequest(OneboxApiEndpoints.ONEBOX_GET_TOKEN, "", body);
+        String resultBody = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_TOKEN, "", body);
 
         if (!resultBody.isEmpty())
             token = JsonUtils.parseJson(resultBody, new TypeReference<Map<String, String>>() {
