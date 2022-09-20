@@ -8,8 +8,8 @@ public class Product {
     private String productCode;
     private String productBrand;
     private String productName;
-    private String productPrice;
-    private String productQty;
+    private Double productPrice;
+    private Integer productQty;
 
     @DynamoDbAttribute("ProductCode")
     public String getProductCode() {
@@ -37,19 +37,19 @@ public class Product {
         this.productName = productName;
     }
     @DynamoDbAttribute("ProductPrice")
-    public String getProductPrice() {
+    public Double getProductPrice() {
         return productPrice;
     }
 
-    public void setProductPrice(String productPrice) {
+    public void setProductPrice(Double productPrice) {
         this.productPrice = productPrice;
     }
     @DynamoDbAttribute("ProductQty")
-    public String getProductQty() {
+    public Integer getProductQty() {
         return productQty;
     }
 
-    public void setProductQty(String productQty) {
+    public void setProductQty(Integer productQty) {
         this.productQty = productQty;
     }
 }

@@ -4,7 +4,7 @@ import com.atlantis.orders.dbtables.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface IOrdersService {
+public interface IOrdersDynamoDbService {
 
     Order getOrderById(Integer id);
     void addOrder (Order order);

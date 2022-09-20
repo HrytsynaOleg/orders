@@ -5,9 +5,7 @@ import com.atlantis.orders.models.Product;
 import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.onebox.OneboxApiSecurityService;
 import com.atlantis.orders.onebox.model.OneboxOrder;
-import com.atlantis.orders.service.IAwsSecretService;
-import com.atlantis.orders.service.IOrdersService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.atlantis.orders.service.IOrdersDynamoDbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,11 +19,9 @@ import java.util.List;
 public class OrdersApplication implements CommandLineRunner {
 
     @Autowired
-    IOrdersService ordersService;
+    IOrdersDynamoDbService ordersService;
     @Autowired
     OneboxApiOrdersService oneboxApiOrdersService;
-    @Autowired
-    OneboxApiSecurityService oneboxApiSecurityService;
 
     public static void main(String[] args) {
         SpringApplication.run(OrdersApplication.class, args);
@@ -34,31 +30,11 @@ public class OrdersApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        String token = oneboxApiSecurityService.getToken();
-        System.out.println(token);
-
-        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getSupplierOrderListByStatus(117);
-
-
-        Order order = ordersService.getOrderById(3455);
-        System.out.println(order);
-
-        Order newOrder = new Order();
-        newOrder.setOrderId(5678);
-        newOrder.setCustomerOrderId("56474");
-        newOrder.setStatus("NEW");
-        newOrder.setSupplierId("12");
-        List<Product> products = new ArrayList<>();
-        Product product = new Product();
-        product.setProductBrand("MEYLE");
-        product.setProductCode("09349894589HD");
-        product.setProductName("Front upper engine mouthing");
-        product.setProductQty("2");
-        product.setProductPrice("457.00");
-        products.add(product);
-        newOrder.setProducts(products);
-
-        ordersService.addOrder(newOrder);
+        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxOrderListByStatus(117);
+        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
+        for (Order order : orders) {
+            ordersService.addOrder(order);
+        }
 
         System.out.println();
     }

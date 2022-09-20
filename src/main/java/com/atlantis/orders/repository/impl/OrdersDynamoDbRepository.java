@@ -1,7 +1,7 @@
 package com.atlantis.orders.repository.impl;
 
 import com.atlantis.orders.dbtables.Order;
-import com.atlantis.orders.repository.IOrdersRepository;
+import com.atlantis.orders.repository.IOrdersDynamoDbRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
@@ -9,12 +9,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.PutItemEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
 @Repository
-public class OrderRepository implements IOrdersRepository {
+public class OrdersDynamoDbRepository implements IOrdersDynamoDbRepository {
 
     private final DynamoDbTable<Order> ordersDynamoDbTable;
 
     @Autowired
-    public OrderRepository(DynamoDbEnhancedClient dynamoDbenhancedClient) {
+    public OrdersDynamoDbRepository(DynamoDbEnhancedClient dynamoDbenhancedClient) {
         this.ordersDynamoDbTable = dynamoDbenhancedClient.table("SupplierOrders", TableSchema.fromBean(Order.class));
     }
 

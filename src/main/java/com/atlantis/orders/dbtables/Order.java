@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Order {
 
-    private Integer orderId;
+    private String orderId;
     private String customerOrderId;
     private List<Product> products;
     private String status;
@@ -22,11 +22,11 @@ public class Order {
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("OrderId")
-    public Integer getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Integer orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 

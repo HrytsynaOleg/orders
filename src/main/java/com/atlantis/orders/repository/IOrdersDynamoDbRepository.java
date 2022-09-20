@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableScan
-public interface IOrdersRepository {
+public interface IOrdersDynamoDbRepository {
 
     Order getOrderById(final Integer orderID);
     void putNewOrder(Order order);

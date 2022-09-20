@@ -40,7 +40,8 @@ public class OneboxApiRequest {
                 .build();
         HttpResponseWrapper<Map<String, Object>> response = HttpExecutor.executePost(httpRequest, new TypeReference<>() {
         });
-        if (response.getStatus().is2xxSuccessful()) return response.getBody();
+        if (response.getStatus().is2xxSuccessful())
+            return response.getBody();
         else {
             System.err.printf("Http request error %s", response.getStatus().toString());
             return null;
