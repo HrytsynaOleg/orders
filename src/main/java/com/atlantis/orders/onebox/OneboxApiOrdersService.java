@@ -22,7 +22,7 @@ public class OneboxApiOrdersService {
         this.securityService = securityService;
     }
 
-    public List<OneboxOrder> getOneboxOrderListByStatus(Integer statusId) {
+    public List<OneboxOrder> getOneboxSupplierOrderListByStatus(Integer statusId) {
 
         Map<String, Object> body = new HashMap<>();
         List<String> orderFields = Arrays.asList("id", "cdate", "name", "client", "workflow", "status", "orderproducts", "customfields");
@@ -40,6 +40,23 @@ public class OneboxApiOrdersService {
         return JsonUtils.parseJson(response, new TypeReference<>() {
         });
 
+    }
+
+    public OneboxOrder getOneboxCustomerOrderById(String orderId) {
+
+        Map<String, Object> body = new HashMap<>();
+        List<String> orderFields = Arrays.asList("id", "cdate", "name", "client", "workflow", "status", "orderproducts", "customfields");
+        List<String> productFields = Arrays.asList("id", "name", "articul", "brand");
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("workflowid", 15);
+        filters.put("id", orderId);
+        body.put("fields", orderFields);
+        body.put("productfields", productFields);
+        body.put("filter", filters);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
+        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {});
+        if(orderList.size()>0) return orderList.get(0);
+        return null;
     }
 
     public boolean setOneboxOrderStatus(Integer orderId, Integer statusId) {

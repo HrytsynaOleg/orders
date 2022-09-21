@@ -22,7 +22,8 @@ public class HttpExecutor {
     }
 
     public static <T> HttpResponseWrapper<T> executeGet(HttpRequestRequest request, TypeReference<T> typeReference) {
-        HttpEntity<Object> httpEntity = new HttpEntity<>(request.getParameters(), request.getHeaders());
+        String bodyJson = JsonUtils.convertObjectToJson(request.getBody());
+        HttpEntity<Object> httpEntity = new HttpEntity<>(bodyJson, request.getHeaders());
         ResponseEntity<String> response = REST_TEMPLATE.exchange(request.getUrl(), HttpMethod.GET, httpEntity, String.class);
         T responseBody = JsonUtils.parseJson(response.getBody(), typeReference);
         HttpStatus statusCode = response.getStatusCode();
