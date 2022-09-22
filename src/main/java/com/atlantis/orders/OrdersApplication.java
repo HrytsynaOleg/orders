@@ -36,21 +36,26 @@ public class OrdersApplication implements CommandLineRunner {
         List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
         for (Order order : orders) {
             ordersService.addOrder(order);
-            OneboxOrder oneboxOrder = oneboxApiOrdersService.getOneboxCustomerOrderById(order.getCustomerOrderId());
-            System.out.println(oneboxOrder.getName());
+            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
+            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
+                supplierApi.addCustomer(order.getCustomer());
+            supplierApi.addCustomerOrder(order);
         }
 
-        OneboxOrder oneboxOrder = oneboxApiOrdersService.getOneboxCustomerOrderById("5803");
-        System.out.println(oneboxOrder.getName());
 
-        ISupplierApi supplierApi = factory.getSupplierApi(1991);
+//        OneboxOrder oneboxOrder = oneboxApiOrdersService.getOneboxCustomerOrderById("5826");
+//        System.out.println(oneboxOrder.getName());
 
-        if (supplierApi.getCustomerId(oneboxOrder.getClient()).isEmpty())
-            supplierApi.addCustomer(oneboxOrder.getClient());
+//        ISupplierApi supplierApi = factory.getSupplierApi(1991);
 
-        System.out.printf("Customer ID - %s%n", supplierApi.getCustomerId(oneboxOrder.getClient()));
+//        if (supplierApi.getCustomerId(oneboxOrder.getClient()).isEmpty())
+//            supplierApi.addCustomer(oneboxOrder.getClient());
+//
+//        System.out.printf("Customer ID - %s%n", supplierApi.getCustomerId(oneboxOrder.getClient()));
 
-        supplierApi.addCustomerOrder(oneboxOrder);
+//
+//        OneboxOrder oneboxSupplierOrder = oneboxApiOrdersService.getOneboxSupplierOrderById("5830");
+//        supplierApi.addCustomerOrder(oneboxSupplierOrder);
 
         System.out.println();
     }

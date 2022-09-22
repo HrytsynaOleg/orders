@@ -1,14 +1,16 @@
 package com.atlantis.orders.supplier;
 
+import com.atlantis.orders.dbtables.Order;
+import com.atlantis.orders.models.Customer;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.onebox.model.OneboxOrderClient;
 import org.springframework.stereotype.Component;
 
 @Component
 public interface ISupplierApi {
-    String addCustomer(OneboxOrderClient customer);
+    String addCustomer(Customer customer);
 
-    String getCustomerId(OneboxOrderClient customer);
+    String getCustomerId(Customer customer);
 
     void addDelivery();
 
@@ -16,7 +18,7 @@ public interface ISupplierApi {
 
     void setCustomerOrder();
 
-    void addCustomerOrder(OneboxOrder order);
+    String addCustomerOrder(Order order);
 
     void getCustomerOrderStatus();
 

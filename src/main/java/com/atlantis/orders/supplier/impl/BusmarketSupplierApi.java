@@ -1,13 +1,12 @@
 package com.atlantis.orders.supplier.impl;
 
-import com.amazonaws.transform.SimpleTypeUnmarshallers;
+import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.httprequest.HttpExecutor;
 import com.atlantis.orders.httprequest.HttpRequestRequest;
 import com.atlantis.orders.httprequest.HttpResponseWrapper;
-import com.atlantis.orders.onebox.model.OneboxOrder;
-import com.atlantis.orders.onebox.model.OneboxOrderClient;
-import com.atlantis.orders.onebox.model.OneboxOrderProduct;
-import com.atlantis.orders.onebox.model.OneboxProduct;
+import com.atlantis.orders.models.Customer;
+import com.atlantis.orders.models.Product;
+import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.supplier.ISupplierApi;
 import com.atlantis.orders.utils.JsonUtils;
@@ -16,27 +15,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @Component
 public class BusmarketSupplierApi implements ISupplierApi {
 
     private final String token;
+    private final OneboxApiOrdersService oneboxApiOrdersService;
 
     @Autowired
-    public BusmarketSupplierApi(IAwsSecretService secretService) {
+    public BusmarketSupplierApi(IAwsSecretService secretService,
+                                OneboxApiOrdersService oneboxApiOrdersService) {
         this.token = secretService.getSecretByKey("busmarket_token");
+        this.oneboxApiOrdersService = oneboxApiOrdersService;
     }
 
     @Override
-    public String addCustomer(OneboxOrderClient customer) {
+    public String addCustomer(Customer customer) {
         String url = "https://api.bm.parts/delivery/receivers";
         Map<String, String> body = new HashMap<>();
-        body.put("surname", customer.getNamelast());
+        body.put("surname", customer.getSurname());
         body.put("name", customer.getName());
-        body.put("middle_name", customer.getNamemiddle());
-        body.put("phone", customer.getPhones().get(0));
+        body.put("middle_name", customer.getMiddleName());
+        body.put("phone", customer.getPhone());
         Map<String, Object> response = getPostRequest(url, body);
         if (response == null) return "";
         try {
@@ -49,12 +49,11 @@ public class BusmarketSupplierApi implements ISupplierApi {
             System.err.println(JsonUtils.convertObjectToJson(response.get("message")));
             return "";
         }
-
     }
 
     @Override
-    public String getCustomerId(OneboxOrderClient customer) {
-        String customerName = customer.getNamelast() + " " + customer.getName() + " " + customer.getNamemiddle();
+    public String getCustomerId(Customer customer) {
+        String customerName = customer.getSurname() + " " + customer.getName() + " " + customer.getMiddleName();
         int pageCounter = 1;
         int pageSize = 100;
         while (pageSize > 0) {
@@ -93,14 +92,40 @@ public class BusmarketSupplierApi implements ISupplierApi {
     }
 
     @Override
-    public void addCustomerOrder(OneboxOrder order) {
-        List<OneboxOrderProduct> productList = order.getOrderproducts();
-        for (OneboxOrderProduct oneboxOrderProduct : productList) {
-            String productId = getProductId(oneboxOrderProduct.getProductinfo().getArticul().replace("NRF", ""),
-                    oneboxOrderProduct.getProductinfo().getBrand().getName());
-            System.out.println(productId);
+    public String addCustomerOrder(Order order) {
+        StringBuilder builder = new StringBuilder("Заказ ");
+        builder.append(order.getCustomerOrderId()).append(" ");
+        builder.append(order.getCustomer().getSurname()).append(" ");
+        builder.append(order.getCustomer().getName()).append(" ");
+        builder.append(order.getCustomer().getMiddleName());
+        String orderName = builder.substring(0,28);
+        Map<String, Object> requestBody = new HashMap<>();
+        List<Map<String, Object>> productsList = new ArrayList<>();
+        for (Product product : order.getProducts()) {
+            String articul = product.getProductCode();
+            String brand = product.getProductBrand();
+            String productId = getProductId(articul, brand);
+            Map<String, Object> requestProduct = new HashMap<>();
+            requestProduct.put("uuid", productId);
+            requestProduct.put("qnt", product.getProductQty());
+            productsList.add(requestProduct);
+            System.out.printf("Product - %s %s - %s %n", articul, brand, productId);
         }
-
+        requestBody.put("name", orderName);
+        requestBody.put("products", productsList);
+        String url = "https://api.bm.parts/shopping/carts";
+        Map<String, Object> response = getPostRequest(url, requestBody);
+        try {
+            Object responseCart = response.get("carts");
+            String responseJson = JsonUtils.convertObjectToJson(responseCart);
+            Map<String, Object> cart = JsonUtils.parseJson(responseJson, new TypeReference<>() {
+            });
+            return (String) cart.get("uuid");
+        } catch (UnsupportedOperationException ex) {
+            Object message = response.get("message");
+            System.err.println(message.toString());
+            return "";
+        }
     }
 
     @Override

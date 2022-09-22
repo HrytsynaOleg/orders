@@ -2,9 +2,11 @@ package com.atlantis.orders.onebox;
 
 import com.atlantis.orders.constants.OneboxApiEndpoints;
 import com.atlantis.orders.dbtables.Order;
+import com.atlantis.orders.models.Customer;
 import com.atlantis.orders.models.Product;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.onebox.model.OneboxOrderProduct;
+import com.atlantis.orders.repository.IBrandSuffixDynamoDbRepository;
 import com.atlantis.orders.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,12 @@ import java.util.*;
 public class OneboxApiOrdersService {
 
     IOneboxApiSecurityService securityService;
+    private final IBrandSuffixDynamoDbRepository brandSuffixRepository;
 
     @Autowired
-    public OneboxApiOrdersService(IOneboxApiSecurityService securityService) {
+    public OneboxApiOrdersService(IOneboxApiSecurityService securityService, IBrandSuffixDynamoDbRepository brandSuffixRepository) {
         this.securityService = securityService;
+        this.brandSuffixRepository = brandSuffixRepository;
     }
 
     public List<OneboxOrder> getOneboxSupplierOrderListByStatus(Integer statusId) {
@@ -59,6 +63,23 @@ public class OneboxApiOrdersService {
         return null;
     }
 
+    public OneboxOrder getOneboxSupplierOrderById(String orderId) {
+
+        Map<String, Object> body = new HashMap<>();
+        List<String> orderFields = Arrays.asList("id", "cdate", "name", "client", "workflow", "status", "orderproducts", "customfields");
+        List<String> productFields = Arrays.asList("id", "name", "articul", "brand");
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("workflowid", 16);
+        filters.put("id", orderId);
+        body.put("fields", orderFields);
+        body.put("productfields", productFields);
+        body.put("filter", filters);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
+        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {});
+        if(orderList.size()>0) return orderList.get(0);
+        return null;
+    }
+
     public boolean setOneboxOrderStatus(Integer orderId, Integer statusId) {
 
 
@@ -70,20 +91,33 @@ public class OneboxApiOrdersService {
         for (OneboxOrder oneboxOrder : orderList) {
             Order order = new Order();
             order.setOrderId(oneboxOrder.getId());
-            order.setCustomerOrderId(oneboxOrder.getCustomfields().get("RoditelskiiprotsessID").getValue());
+            String customerOrderId =oneboxOrder.getCustomfields().get("RoditelskiiprotsessID").getValue();
+            order.setCustomerOrderId(customerOrderId);
             order.setStatus(oneboxOrder.getStatus().getId());
             order.setSupplierId(oneboxOrder.getClient().getId());
             List<Product> productList = new ArrayList<>();
             for (OneboxOrderProduct orderproduct : oneboxOrder.getOrderproducts()) {
                 Product product = new Product();
-                product.setProductCode(orderproduct.getProductinfo().getArticul());
-                product.setProductBrand(orderproduct.getProductinfo().getBrand().getName());
+                String articul = orderproduct.getProductinfo().getArticul();
+                String brand = orderproduct.getProductinfo().getBrand().getName();
+                if (!brandSuffixRepository.getSuffix(brand).isEmpty())
+                    articul = articul.substring(0, articul.length() - 3);
+                product.setProductCode(articul);
+                product.setProductBrand(brand);
                 product.setProductName(orderproduct.getName());
                 product.setProductPrice(orderproduct.getPricewithdiscount());
                 product.setProductQty(Integer.valueOf(orderproduct.getCount().replace(".000","")));
                 productList.add(product);
             }
             order.setProducts(productList);
+            OneboxOrder customerOrder = getOneboxCustomerOrderById(customerOrderId);
+            Customer customer = new Customer();
+            customer.setId(customerOrder.getClient().getId());
+            customer.setName(customerOrder.getClient().getName());
+            customer.setSurname(customerOrder.getClient().getNamelast());
+            customer.setMiddleName(customerOrder.getClient().getNamemiddle());
+            customer.setPhone(customerOrder.getClient().getPhones().get(0));
+            order.setCustomer(customer);
             orders.add(order);
         }
         return orders;

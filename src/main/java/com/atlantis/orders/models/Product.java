@@ -10,6 +10,7 @@ public class Product {
     private String productName;
     private Double productPrice;
     private Integer productQty;
+    private String productUuid;
 
     @DynamoDbAttribute("ProductCode")
     public String getProductCode() {
@@ -51,5 +52,13 @@ public class Product {
 
     public void setProductQty(Integer productQty) {
         this.productQty = productQty;
+    }
+    @DynamoDbAttribute("ProductUuid")
+    public String getProductUuid() {
+        return productUuid;
+    }
+
+    public void setProductUuid(String productUuid) {
+        this.productUuid = productUuid;
     }
 }

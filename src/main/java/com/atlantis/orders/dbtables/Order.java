@@ -1,5 +1,6 @@
 package com.atlantis.orders.dbtables;
 
+import com.atlantis.orders.models.Customer;
 import com.atlantis.orders.models.Product;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
@@ -13,6 +14,7 @@ public class Order {
 
     private String orderId;
     private String customerOrderId;
+    private Customer customer;
     private List<Product> products;
     private String status;
     private String supplierId;
@@ -37,6 +39,15 @@ public class Order {
 
     public void setCustomerOrderId(String customerOrderId) {
         this.customerOrderId = customerOrderId;
+    }
+
+    @DynamoDbAttribute("Customer")
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     @DynamoDbAttribute("Products")
