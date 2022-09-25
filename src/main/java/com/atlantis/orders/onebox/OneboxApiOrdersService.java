@@ -4,17 +4,20 @@ import com.atlantis.orders.constants.OneboxApiEndpoints;
 import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.models.Customer;
 import com.atlantis.orders.models.Product;
+import com.atlantis.orders.onebox.IOneboxApiSecurityService;
+import com.atlantis.orders.onebox.OneboxApiRequest;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.onebox.model.OneboxOrderProduct;
 import com.atlantis.orders.repository.IBrandSuffixDynamoDbRepository;
 import com.atlantis.orders.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
+@Component
 public class OneboxApiOrdersService {
 
     IOneboxApiSecurityService securityService;

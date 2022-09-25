@@ -1,18 +1,12 @@
 package com.atlantis.orders;
 
-import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.onebox.OneboxApiOrdersService;
-import com.atlantis.orders.onebox.model.OneboxOrder;
-import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.service.IOrdersDynamoDbService;
-import com.atlantis.orders.supplier.ISupplierApi;
 import com.atlantis.orders.supplier.impl.SupplierApiFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
 
 
 @SpringBootApplication
@@ -32,32 +26,19 @@ public class OrdersApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
-        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
-        for (Order order : orders) {
-            ordersService.addOrder(order);
-            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
-            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
-                supplierApi.addCustomer(order.getCustomer());
-            supplierApi.addCustomerOrder(order);
-        }
+//        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
+//        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
+//        for (Order order : orders) {
+//            ordersService.addOrder(order);
+//            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
+//            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
+//                supplierApi.addCustomer(order.getCustomer());
+//            supplierApi.addCustomerOrder(order);
+//        }
 
 
-//        OneboxOrder oneboxOrder = oneboxApiOrdersService.getOneboxCustomerOrderById("5826");
-//        System.out.println(oneboxOrder.getName());
 
-//        ISupplierApi supplierApi = factory.getSupplierApi(1991);
-
-//        if (supplierApi.getCustomerId(oneboxOrder.getClient()).isEmpty())
-//            supplierApi.addCustomer(oneboxOrder.getClient());
-//
-//        System.out.printf("Customer ID - %s%n", supplierApi.getCustomerId(oneboxOrder.getClient()));
-
-//
-//        OneboxOrder oneboxSupplierOrder = oneboxApiOrdersService.getOneboxSupplierOrderById("5830");
-//        supplierApi.addCustomerOrder(oneboxSupplierOrder);
-
-        System.out.println();
+//        System.out.println();
     }
 
 }

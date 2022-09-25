@@ -5,12 +5,13 @@ import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class OneboxApiSecurityService implements IOneboxApiSecurityService{
 
     private static String token;

@@ -1,5 +1,6 @@
 package com.atlantis.orders.config;
 
+import com.atlantis.orders.service.impl.OrdersDynamoDbServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -24,4 +25,5 @@ public class DynamoDbConfig {
                 .dynamoDbClient(getDynamoDbClient())
                 .build();
     }
+
 }
