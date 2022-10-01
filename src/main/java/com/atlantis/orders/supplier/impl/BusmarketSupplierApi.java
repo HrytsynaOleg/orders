@@ -10,11 +10,14 @@ import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.service.IAwsSecretService;
 import com.atlantis.orders.supplier.ISupplierApi;
 import com.atlantis.orders.utils.JsonUtils;
+import com.atlantis.orders.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class BusmarketSupplierApi implements ISupplierApi {
@@ -98,7 +101,7 @@ public class BusmarketSupplierApi implements ISupplierApi {
         builder.append(order.getCustomer().getSurname()).append(" ");
         builder.append(order.getCustomer().getName()).append(" ");
         builder.append(order.getCustomer().getMiddleName());
-        String orderName = builder.substring(0,28);
+        String orderName = builder.substring(0, 28);
         Map<String, Object> requestBody = new HashMap<>();
         List<Map<String, Object>> productsList = new ArrayList<>();
         for (Product product : order.getProducts()) {
@@ -149,10 +152,15 @@ public class BusmarketSupplierApi implements ISupplierApi {
                 + productBrand + "&search_mode=strict";
         Map<String, Object> response = getGetRequest(url, "");
         String responseJson = JsonUtils.convertObjectToJson(response.get("products"));
-        NavigableMap<String, Object> products = JsonUtils.parseJson(responseJson, new TypeReference<>() {
+        NavigableMap<String, BusmarketProduct> products = JsonUtils.parseJson(responseJson, new TypeReference<>() {
         });
-        if (products.size() > 0) return products.firstEntry().getKey();
-        return "";
+        if (products.size() == 0) return "";
+        return products.entrySet().stream()
+                .filter(b -> (b.getValue().getBrand().equals(productBrand))
+                        && (StringUtils.removeSymbols(b.getValue().getArticle()).equals(productCode)))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("");
     }
 
     private Map<String, Object> getGetRequest(String url, Object body) {
@@ -186,5 +194,23 @@ public class BusmarketSupplierApi implements ISupplierApi {
             System.err.printf("Http request error %s", response.getStatus().toString());
             return null;
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class BusmarketProduct {
+        private String brand;
+        private String article;
+
+        public BusmarketProduct() {
+        }
+
+        public String getBrand() {
+            return brand;
+        }
+
+        public String getArticle() {
+            return article;
+        }
+
     }
 }
