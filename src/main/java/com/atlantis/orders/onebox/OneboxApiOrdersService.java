@@ -4,8 +4,6 @@ import com.atlantis.orders.constants.OneboxApiEndpoints;
 import com.atlantis.orders.dbtables.Order;
 import com.atlantis.orders.models.Customer;
 import com.atlantis.orders.models.Product;
-import com.atlantis.orders.onebox.IOneboxApiSecurityService;
-import com.atlantis.orders.onebox.OneboxApiRequest;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.onebox.model.OneboxOrderProduct;
 import com.atlantis.orders.repository.IBrandSuffixDynamoDbRepository;
@@ -13,19 +11,17 @@ import com.atlantis.orders.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Component
 public class OneboxApiOrdersService {
 
-    IOneboxApiSecurityService securityService;
     private final IBrandSuffixDynamoDbRepository brandSuffixRepository;
 
     @Autowired
-    public OneboxApiOrdersService(IOneboxApiSecurityService securityService, IBrandSuffixDynamoDbRepository brandSuffixRepository) {
-        this.securityService = securityService;
+    public OneboxApiOrdersService(IBrandSuffixDynamoDbRepository brandSuffixRepository) {
+
         this.brandSuffixRepository = brandSuffixRepository;
     }
 
@@ -42,7 +38,7 @@ public class OneboxApiOrdersService {
         body.put("fields", orderFields);
         body.put("productfields", productFields);
         body.put("filter", filters);
-        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, body);
 
         return JsonUtils.parseJson(response, new TypeReference<>() {
         });
@@ -60,9 +56,10 @@ public class OneboxApiOrdersService {
         body.put("fields", orderFields);
         body.put("productfields", productFields);
         body.put("filter", filters);
-        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
-        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {});
-        if(orderList.size()>0) return orderList.get(0);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, body);
+        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {
+        });
+        if (orderList.size() > 0) return orderList.get(0);
         return null;
     }
 
@@ -77,16 +74,24 @@ public class OneboxApiOrdersService {
         body.put("fields", orderFields);
         body.put("productfields", productFields);
         body.put("filter", filters);
-        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, securityService.getToken(), body);
-        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {});
-        if(orderList.size()>0) return orderList.get(0);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_GET_ORDERS, body);
+        List<OneboxOrder> orderList = JsonUtils.parseJson(response, new TypeReference<>() {
+        });
+        if (orderList.size() > 0) return orderList.get(0);
         return null;
     }
 
-    public boolean setOneboxOrderStatus(Integer orderId, Integer statusId) {
-
-
-        return true;
+    public int setOneboxOrderStatus(int orderId, int statusId) {
+        Map<String, Object> orderMap = new HashMap<>();
+        orderMap.put("orderid", orderId);
+        orderMap.put("statusid", statusId);
+        List<Map<String, Object>> body = new ArrayList<>();
+        body.add(orderMap);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_SET_ORDERS, body);
+        List<Integer> responseMap = JsonUtils.parseJson(response, new TypeReference<>() {
+        });
+        int result = responseMap.get(0);
+        return result;
     }
 
     public List<Order> parseToDynamoDbOrders(List<OneboxOrder> orderList) {
@@ -94,7 +99,7 @@ public class OneboxApiOrdersService {
         for (OneboxOrder oneboxOrder : orderList) {
             Order order = new Order();
             order.setOrderId(oneboxOrder.getId());
-            String customerOrderId =oneboxOrder.getCustomfields().get("RoditelskiiprotsessID").getValue();
+            String customerOrderId = oneboxOrder.getCustomfields().get("RoditelskiiprotsessID").getValue();
             order.setCustomerOrderId(customerOrderId);
             order.setStatus(oneboxOrder.getStatus().getId());
             order.setSupplierId(oneboxOrder.getClient().getId());
@@ -109,7 +114,7 @@ public class OneboxApiOrdersService {
                 product.setProductBrand(brand);
                 product.setProductName(orderproduct.getName());
                 product.setProductPrice(orderproduct.getPricewithdiscount());
-                product.setProductQty(Integer.valueOf(orderproduct.getCount().replace(".000","")));
+                product.setProductQty(Integer.valueOf(orderproduct.getCount().replace(".000", "")));
                 productList.add(product);
             }
             order.setProducts(productList);

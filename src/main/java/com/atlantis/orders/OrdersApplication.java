@@ -1,6 +1,7 @@
 package com.atlantis.orders;
 
 import com.atlantis.orders.dbtables.Order;
+import com.atlantis.orders.models.SupplierOrderStatus;
 import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.service.IOrdersDynamoDbService;
@@ -31,19 +32,21 @@ public class OrdersApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-//        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
-//        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
-//        for (Order order : orders) {
-//            ordersService.addOrder(order);
-//            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
-//            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
-//                supplierApi.addCustomer(order.getCustomer());
-//            supplierApi.addCustomerOrder(order);
-//        }
+        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
+        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
+        for (Order order : orders) {
+            ordersService.addOrder(order);
+            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
+            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
+                supplierApi.addCustomer(order.getCustomer());
+            supplierApi.addCustomerOrder(order);
+            oneboxApiOrdersService.setOneboxOrderStatus(Integer.parseInt(order.getOrderId()), SupplierOrderStatus.SENT.getStatusCode());
+            System.out.println();
+        }
 
 
 
-//        System.out.println();
+        System.out.println();
     }
 
 }

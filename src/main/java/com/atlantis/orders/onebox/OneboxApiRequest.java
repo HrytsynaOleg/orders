@@ -6,14 +6,26 @@ import com.atlantis.orders.httprequest.HttpResponseWrapper;
 import com.atlantis.orders.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
+@Component
 public class OneboxApiRequest {
-    @Autowired
-    static IOneboxApiSecurityService securityService;
 
-    public static String getHttpPostRequest(String url, String token, Object body) {
+    private static IOneboxApiSecurityService securityService;
+
+    @Autowired
+    private IOneboxApiSecurityService tmpSecurityService;
+
+//    @Autowired
+//    public OneboxApiRequest(IOneboxApiSecurityService securityService) {
+//        OneboxApiRequest.securityService = securityService;
+//    }
+
+    public static String getHttpPostRequest(String url, Object body) {
+        String token = securityService.getToken();
         Map<String, Object> response;
         if ((response = getPostRequest(url, token, body)) == null) return "";
         Object dataArray;
@@ -33,6 +45,7 @@ public class OneboxApiRequest {
     }
 
     private static Map<String, Object> getPostRequest(String url, String token, Object body) {
+
         HttpRequestRequest httpRequest = HttpRequestRequest.builder()
                 .withUrl(url)
                 .withBody(body)
@@ -46,5 +59,10 @@ public class OneboxApiRequest {
             System.err.printf("Http request error %s", response.getStatus().toString());
             return null;
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        securityService = tmpSecurityService;
     }
 }
