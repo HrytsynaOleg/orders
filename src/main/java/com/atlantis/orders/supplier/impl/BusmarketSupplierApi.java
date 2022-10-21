@@ -95,13 +95,18 @@ public class BusmarketSupplierApi implements ISupplierApi {
     }
 
     @Override
-    public String addCustomerOrder(Order order) {
-        StringBuilder builder = new StringBuilder("Заказ ");
-        builder.append(order.getCustomerOrderId()).append(" ");
-        builder.append(order.getCustomer().getSurname()).append(" ");
-        builder.append(order.getCustomer().getName()).append(" ");
-        builder.append(order.getCustomer().getMiddleName());
-        String orderName = builder.substring(0, 28);
+    public String addCustomerOrder(Order order, boolean isDropship) {
+
+        String orderName = "На склад " + order.getCustomer().getSurname();
+
+        if (isDropship) {
+            StringBuilder builder = new StringBuilder("Заказ ");
+            builder.append(order.getCustomerOrderId()).append(" ");
+            builder.append(order.getCustomer().getSurname()).append(" ");
+            builder.append(order.getCustomer().getName()).append(" ");
+            builder.append(order.getCustomer().getMiddleName());
+            orderName = builder.substring(0, 28);
+        }
         Map<String, Object> requestBody = new HashMap<>();
         List<Map<String, Object>> productsList = new ArrayList<>();
         for (Product product : order.getProducts()) {

@@ -32,17 +32,17 @@ public class OrdersApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
-        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
-        for (Order order : orders) {
-            ordersService.addOrder(order);
-            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
-            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
-                supplierApi.addCustomer(order.getCustomer());
-            supplierApi.addCustomerOrder(order);
-            oneboxApiOrdersService.setOneboxOrderStatus(Integer.parseInt(order.getOrderId()), SupplierOrderStatus.SENT.getStatusCode());
-            System.out.println();
-        }
+//        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(117);
+//        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
+//        for (Order order : orders) {
+//            ordersService.addOrder(order);
+//            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
+//            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
+//                supplierApi.addCustomer(order.getCustomer());
+//            supplierApi.addCustomerOrder(order);
+//            oneboxApiOrdersService.setOneboxOrderStatus(Integer.parseInt(order.getOrderId()), SupplierOrderStatus.SENT.getStatusCode());
+//            System.out.println();
+//        }
 
 
 

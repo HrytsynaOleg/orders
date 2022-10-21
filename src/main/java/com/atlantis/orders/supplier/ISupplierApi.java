@@ -18,7 +18,7 @@ public interface ISupplierApi {
 
     void setCustomerOrder();
 
-    String addCustomerOrder(Order order);
+    String addCustomerOrder(Order order, boolean isDropship);
 
     void getCustomerOrderStatus();
 

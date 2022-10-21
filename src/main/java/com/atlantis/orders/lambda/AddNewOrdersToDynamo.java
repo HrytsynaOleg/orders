@@ -36,14 +36,30 @@ public class AddNewOrdersToDynamo implements RequestHandler<Object, Map<String, 
     @Override
     public Map<String, Object> handleRequest(Object o, Context context) {
         StringBuilder builder = new StringBuilder("Orders added :\n");
-        List<OneboxOrder> supplierOrderListByStatus = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(SupplierOrderStatus.NEW.getStatusCode());
-        List<Order> orders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierOrderListByStatus);
-        for (Order order : orders) {
+        List<OneboxOrder> supplierNewOrdersForStore = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(SupplierOrderStatus.NEW.getStatusCode());
+        List<OneboxOrder> supplierNewDropShipOrders = oneboxApiOrdersService.getOneboxSupplierOrderListByStatus(SupplierOrderStatus.NEW_DROPSHIP.getStatusCode());
+        List<Order> storeOrders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierNewOrdersForStore);
+        List<Order> dropShipOrders = oneboxApiOrdersService.parseToDynamoDbOrders(supplierNewDropShipOrders);
+        for (Order order : dropShipOrders) {
             ordersService.addOrder(order);
             ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
             if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
                 supplierApi.addCustomer(order.getCustomer());
-            supplierApi.addCustomerOrder(order);
+            supplierApi.addCustomerOrder(order, true);
+            builder.append(String.format("     Заказ №  %s %s дропшип%n", order.getOrderId(), order.getCustomer().getSurname()));
+            List<Product> products = order.getProducts();
+            for (Product product : products) {
+                builder.append(String.format("           --> %s %s %s - %s шт%n", product.getProductCode(), product.getProductBrand(),
+                        product.getProductName(), product.getProductQty()));
+            }
+            oneboxApiOrdersService.setOneboxOrderStatus(Integer.parseInt(order.getOrderId()), SupplierOrderStatus.SENT.getStatusCode());
+        }
+        for (Order order : storeOrders) {
+            ordersService.addOrder(order);
+            ISupplierApi supplierApi = factory.getSupplierApi(Integer.valueOf(order.getSupplierId()));
+            if (supplierApi.getCustomerId(order.getCustomer()).isEmpty())
+                supplierApi.addCustomer(order.getCustomer());
+            supplierApi.addCustomerOrder(order,false);
             builder.append(String.format("     Заказ №  %s %s%n", order.getOrderId(), order.getCustomer().getSurname()));
             List<Product> products = order.getProducts();
             for (Product product : products) {
