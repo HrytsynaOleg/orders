@@ -94,6 +94,19 @@ public class OneboxApiOrdersService {
         return result;
     }
 
+    public int setOneboxOrderShippedNumber(int orderId, String number) {
+        Map<String, Object> orderMap = new HashMap<>();
+        orderMap.put("orderid", orderId);
+        orderMap.put("deliverynote", number);
+        List<Map<String, Object>> body = new ArrayList<>();
+        body.add(orderMap);
+        String response = OneboxApiRequest.getHttpPostRequest(OneboxApiEndpoints.ONEBOX_SET_ORDERS, body);
+        List<Integer> responseMap = JsonUtils.parseJson(response, new TypeReference<>() {
+        });
+        int result = responseMap.get(0);
+        return result;
+    }
+
     public List<Order> parseToDynamoDbOrders(List<OneboxOrder> orderList) {
         List<Order> orders = new ArrayList<>();
         for (OneboxOrder oneboxOrder : orderList) {

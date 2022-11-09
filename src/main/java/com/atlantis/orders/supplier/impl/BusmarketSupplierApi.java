@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class BusmarketSupplierApi implements ISupplierApi {
@@ -95,6 +94,19 @@ public class BusmarketSupplierApi implements ISupplierApi {
     }
 
     @Override
+    public Map<String, String> getShippedOrders() {
+        Map<String, String> resultMap = new HashMap<>();
+        List<BusmarketDocument> documentList = getShippedDocumentsList();
+        for (BusmarketDocument busmarketDocument : documentList) {
+            BusmarketDocument document = getDocument(busmarketDocument.getUuid());
+            if (document.getCarrier().getName().equals("Нова пошта")) {
+                resultMap.put(document.carrierNumber, document.getReceiver().getFullName());
+            }
+        }
+        return resultMap;
+    }
+
+    @Override
     public String addCustomerOrder(Order order, boolean isDropship) {
 
         String orderName = "На склад " + order.getCustomer().getSurname();
@@ -151,6 +163,22 @@ public class BusmarketSupplierApi implements ISupplierApi {
         return 1991;
     }
 
+    private List<BusmarketDocument> getShippedDocumentsList() {
+        String url = "https://api.bm.parts/documents/list?type=00003A4D&period=today";
+        Map<String, Object> response = getGetRequest(url, "");
+        String responseJson = JsonUtils.convertObjectToJson(response.get("documents"));
+        return JsonUtils.parseJson(responseJson, new TypeReference<>() {
+        });
+    }
+
+    private BusmarketDocument getDocument(String uuid) {
+        String url = "https://api.bm.parts/documents/00003A4D/" + uuid;
+        Map<String, Object> response = getGetRequest(url, "");
+        String responseJson = JsonUtils.convertObjectToJson(response.get("document"));
+        return JsonUtils.parseJson(responseJson, new TypeReference<>() {
+        });
+    }
+
     private String getProductId(String productCode, String productBrand) {
         String url = "https://api.bm.parts/search/products?q="
                 + productCode + "&brands="
@@ -183,6 +211,7 @@ public class BusmarketSupplierApi implements ISupplierApi {
             return null;
         }
     }
+
 
     private Map<String, Object> getPostRequest(String url, Object body) {
         HttpRequestRequest httpRequest = HttpRequestRequest.builder()
@@ -217,5 +246,68 @@ public class BusmarketSupplierApi implements ISupplierApi {
             return article;
         }
 
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class BusmarketDocumentCarrier {
+        private String uuid;
+        private String name;
+
+        public BusmarketDocumentCarrier() {
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class BusmarketDocumentReceiver {
+        private String uuid;
+        private String fullName;
+
+        public BusmarketDocumentReceiver() {
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public String getFullName() {
+            return fullName;
+        }
+    }
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class BusmarketDocument {
+        private BusmarketDocumentCarrier carrier;
+        private BusmarketDocumentReceiver receiver;
+        private String carrierNumber;
+        private String uuid;
+
+
+        public BusmarketDocument() {
+        }
+
+        public BusmarketDocumentCarrier getCarrier() {
+            return carrier;
+        }
+
+        public BusmarketDocumentReceiver getReceiver() {
+            return receiver;
+        }
+
+        public String getCarrierNumber() {
+            return carrierNumber;
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
     }
 }

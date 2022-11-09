@@ -6,6 +6,8 @@ import com.atlantis.orders.onebox.model.OneboxOrder;
 import com.atlantis.orders.onebox.model.OneboxOrderClient;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public interface ISupplierApi {
     String addCustomer(Customer customer);
@@ -17,6 +19,8 @@ public interface ISupplierApi {
     void getDelivery();
 
     void setCustomerOrder();
+
+    Map<String,String> getShippedOrders();
 
     String addCustomerOrder(Order order, boolean isDropship);
 
