@@ -98,9 +98,9 @@ public class BusmarketSupplierApi implements ISupplierApi {
         Map<String, String> resultMap = new HashMap<>();
         List<BusmarketDocument> documentList = getShippedDocumentsList();
         for (BusmarketDocument busmarketDocument : documentList) {
-            BusmarketDocument document = getDocument(busmarketDocument.getUuid());
+            BusmarketDocument document = getDocument(busmarketDocument.getDocumentuuid());
             if (document.getCarrier().getName().equals("Нова пошта")) {
-                resultMap.put(document.carrierNumber, document.getReceiver().getFullName());
+                resultMap.put(document.getCarriernumber(), document.getReceiver().getFullname());
             }
         }
         return resultMap;
@@ -167,6 +167,9 @@ public class BusmarketSupplierApi implements ISupplierApi {
         String url = "https://api.bm.parts/documents/list?type=00003A4D&period=today";
         Map<String, Object> response = getGetRequest(url, "");
         String responseJson = JsonUtils.convertObjectToJson(response.get("documents"));
+        responseJson = responseJson.replace("_", "");
+//        responseJson = responseJson.replace("document_uuid", "documentuuid");
+//        responseJson = responseJson.replace("carrier_number", "carriernumber");
         return JsonUtils.parseJson(responseJson, new TypeReference<>() {
         });
     }
@@ -175,6 +178,9 @@ public class BusmarketSupplierApi implements ISupplierApi {
         String url = "https://api.bm.parts/documents/00003A4D/" + uuid;
         Map<String, Object> response = getGetRequest(url, "");
         String responseJson = JsonUtils.convertObjectToJson(response.get("document"));
+        responseJson = responseJson.replace("_", "");
+//        responseJson = responseJson.replace("full_name", "fullname");
+//        responseJson = responseJson.replace("carrier_number", "carriernumber");
         return JsonUtils.parseJson(responseJson, new TypeReference<>() {
         });
     }
@@ -268,7 +274,7 @@ public class BusmarketSupplierApi implements ISupplierApi {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class BusmarketDocumentReceiver {
         private String uuid;
-        private String fullName;
+        private String fullname;
 
         public BusmarketDocumentReceiver() {
         }
@@ -277,8 +283,8 @@ public class BusmarketSupplierApi implements ISupplierApi {
             return uuid;
         }
 
-        public String getFullName() {
-            return fullName;
+        public String getFullname() {
+            return fullname;
         }
     }
 
@@ -287,8 +293,8 @@ public class BusmarketSupplierApi implements ISupplierApi {
     private static class BusmarketDocument {
         private BusmarketDocumentCarrier carrier;
         private BusmarketDocumentReceiver receiver;
-        private String carrierNumber;
-        private String uuid;
+        private String carriernumber;
+        private String documentuuid;
 
 
         public BusmarketDocument() {
@@ -302,12 +308,13 @@ public class BusmarketSupplierApi implements ISupplierApi {
             return receiver;
         }
 
-        public String getCarrierNumber() {
-            return carrierNumber;
+        public String getCarriernumber() {
+            return carriernumber;
         }
 
-        public String getUuid() {
-            return uuid;
+        public String getDocumentuuid() {
+            return documentuuid;
         }
+
     }
 }

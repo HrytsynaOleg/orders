@@ -2,8 +2,6 @@ package com.atlantis.orders.lambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.atlantis.orders.dbtables.Order;
-import com.atlantis.orders.models.Product;
 import com.atlantis.orders.models.SupplierOrderStatus;
 import com.atlantis.orders.onebox.OneboxApiOrdersService;
 import com.atlantis.orders.onebox.model.OneboxOrder;
@@ -19,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class GetShippedOrders implements RequestHandler<Object, Map<String, Object>> {
+
     static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext("com.atlantis.orders");
 
     public GetShippedOrders() {
@@ -32,7 +31,6 @@ public class GetShippedOrders implements RequestHandler<Object, Map<String, Obje
     @Autowired
     private SupplierApiFactory factory;
 
-    @Override
     public Map<String, Object> handleRequest(Object o, Context context) {
         StringBuilder builder = new StringBuilder("Orders shipped :\n");
         List<OneboxOrder> supplierOrdersWaitShipping = oneboxApiOrdersService.
