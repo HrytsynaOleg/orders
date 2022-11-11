@@ -44,7 +44,7 @@ public class GetShippedOrders implements RequestHandler<Object, Map<String, Obje
                         .filter(e -> Objects.equals(e.getValue(), customerName))
                         .findFirst()
                         .get().getKey();
-                builder.append(oneboxOrder.getCustomfields().get("RoditelskiiprotsessID")).append(" ");
+                builder.append(oneboxOrder.getCustomfields().get("RoditelskiiprotsessID").getValue()).append(" ");
                 builder.append(customerName).append(" ");
                 builder.append(shippedNumber).append(" \n");
                 oneboxApiOrdersService.setOneboxOrderShippedNumber(Integer.parseInt(oneboxOrder.getId()),shippedNumber);
